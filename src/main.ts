@@ -302,8 +302,8 @@ export function run(
         return resolve();
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 CC Reporter coverage upload failed!');
-        return reject(err);
+        error('🚨 CC Reporter coverage upload failed!');
+        return resolve();
       }
     }
 
