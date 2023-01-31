@@ -1,6 +1,6 @@
 import { platform } from 'os';
 import { chdir } from 'process';
-import { debug, error, setFailed, warning, info } from '@actions/core';
+import { debug, error, warning, info } from '@actions/core';
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import * as glob from '@actions/glob';
@@ -100,7 +100,7 @@ export function run(
     if (platform() === 'win32') {
       const err = new Error('CC Reporter is not supported on Windows!');
       error(err.message);
-      setFailed('🚨 CodeClimate Reporter will not run on Windows!');
+      error('🚨 CodeClimate Reporter will not run on Windows!');
       return reject(err);
     }
 
@@ -113,7 +113,7 @@ export function run(
         debug('✅ Changing working directory completed...');
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 Changing working directory failed!');
+        error('🚨 Changing working directory failed!');
         return reject(err);
       }
     }
@@ -124,7 +124,7 @@ export function run(
       debug('✅ CC Reporter downloaded...');
     } catch (err) {
       error((err as Error).message);
-      setFailed('🚨 CC Reporter download failed!');
+      error('🚨 CC Reporter download failed!');
       warning(`Could not download ${downloadUrl}`);
       warning(
         `Please check if your platform is supported — see https://docs.codeclimate.com/docs/configuring-test-coverage#section-locations-of-pre-built-binaries`
@@ -152,7 +152,7 @@ export function run(
         debug('✅ CC Reported checksum verification completed...');
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 CC Reporter checksum verfication failed!');
+        error('🚨 CC Reporter checksum verfication failed!');
         return reject(err);
       }
 
@@ -173,7 +173,7 @@ export function run(
         debug('✅ CC Reported GPG signature verification completed...');
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 CC Reporter GPG signature verfication failed!');
+        error('🚨 CC Reporter GPG signature verfication failed!');
         return reject(err);
       }
     }
@@ -191,7 +191,7 @@ export function run(
       debug('✅ CC Reporter before-build checkin completed...');
     } catch (err) {
       error((err as Error).message);
-      setFailed('🚨 CC Reporter before-build checkin failed!');
+      error('🚨 CC Reporter before-build checkin failed!');
       return reject(err);
     }
 
@@ -204,7 +204,7 @@ export function run(
         debug('✅ Coverage run completed...');
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 Coverage run failed!');
+        error('🚨 Coverage run failed!');
         return reject(err);
       }
     } else {
@@ -232,7 +232,7 @@ export function run(
             } (${typeof coverageLocations[i]})`
           );
           error(err.message);
-          setFailed(
+          error(
             '🚨 Coverage formatter type not set! Each coverage location should be of the format <file_path>:<coverage_format>'
           );
           return reject(err);
@@ -261,7 +261,7 @@ export function run(
           }
         } catch (err) {
           error((err as Error).message);
-          setFailed('🚨 CC Reporter coverage formatting failed!');
+          error('🚨 CC Reporter coverage formatting failed!');
           return reject(err);
         }
       }
@@ -286,7 +286,7 @@ export function run(
         }
       } catch (err) {
         error((err as Error).message);
-        setFailed('🚨 CC Reporter coverage sum failed!');
+        error('🚨 CC Reporter coverage sum failed!');
         return reject(err);
       }
 
@@ -324,7 +324,7 @@ export function run(
       return resolve();
     } catch (err) {
       error((err as Error).message);
-      setFailed('🚨 CC Reporter after-build checkin failed!');
+      error('🚨 CC Reporter after-build checkin failed!');
       return reject(err);
     }
   });
@@ -362,5 +362,7 @@ if (require.main === module) {
     coverageLocations,
     coveragePrefix,
     verifyDownload
-  );
+  ).catch(err => {
+    process.exit(0);
+  });
 }
